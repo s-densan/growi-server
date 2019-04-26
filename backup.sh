@@ -1,3 +1,4 @@
+# set variables
 backup_root_dir=~/backup
 backup_dir_name=growi_backup_$(date '+%Y%m%d_%H%M%S')
 backup_dir_path=${backup_root_dir}/${backup_dir_name}
