@@ -1,5 +1,6 @@
 cd ~/source/growi-server
 sudo git fetch
+sudo git reset --hard
 cp pull_from_github.sh ~/
 cp backup.sh ~/
 sudo cp crontab /var/spool/cron/crontabs/decide_in_the_eyes
