@@ -26,5 +26,7 @@
 
 CRON_TZ=Asia/Tokyo
 # backup growi
-0 */3  * * *   ~/backup.sh
+0 3 * * *   ~/backup.sh
 # push from github
+# every 0min, 30min
+0,30 * * * *   ~/pull_from_github.sh
