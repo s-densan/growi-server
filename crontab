@@ -27,3 +27,4 @@
 CRON_TZ=Asia/Tokyo
 # backup growi
 0 */3  * * *   ~/backup.sh
+# push from github
