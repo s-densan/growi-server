@@ -15,4 +15,6 @@ tar -Jcvf "${archive_file_path}" -C "${backup_root_dir}" "${backup_dir_name}"
 ~/go/bin/skicka upload "${archive_file_path}" /growi/backup/
 
 # Slack通知
-python3 ~/source/growi-server/postwebhook.py "バックアップを取得しました。${archive_file_name}"
+MESSAGE="バックアップを取得しました。${archive_file_name}"
+python3 ~/source/growi-server/postwebhook.py ${MESSAGE}
+logger -- ${MESSAGE}
