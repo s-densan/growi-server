@@ -16,7 +16,7 @@ def main(args :List[str]) -> int:
         return 1
     message = args[1]
     urls = {
-       'notify_slack_system' : 'https://hooks.slack.com/services/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',
+       'notify_slack_system' : 'https://hooks.slack.com/services/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',
     }
     data = create_slack_data(message)
     post_webhook(urls['notify_slack_system'], data)
