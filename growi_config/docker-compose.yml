@@ -1,0 +1,96 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000    # localhost only by default
+    links:
+      - mongo:mongo
+      - elasticsearch:elasticsearch
+    depends_on:
+      - mongo
+      - elasticsearch
+    env_file: .env
+    environment:
+      #- MONGO_URI=mongodb://mongo:27017/growi
+      - MONGO_URI=mongodb://${MONGO_GROWI_USERNAME}:${MONGO_GROWI_PASSWORD}@mongo:27017/growi
+      - ELASTICSEARCH_URI=http://elasticsearch:9200/growi
+      - PASSWORD_SEED=changeme
+      # - FILE_UPLOAD=mongodb   # activate this line if you use MongoDB GridFS rather than AWS
+      - FILE_UPLOAD=local     # activate this line if you use local storage of server rather than AWS
+      # - MATHJAX=1             # activate this line if you want to use MathJax
+      # - PLANTUML_URI=http://  # activate this line and specify if you use your own PlantUML server rather than public plantuml.com
+      # - HACKMD_URI=http://    # activate this line and specify HackMD server URI which can be accessed from GROWI client browsers
+      # - HACKMD_URI_FOR_SERVER=http://hackmd:3000  # activate this line and specify HackMD server URI which can be accessed from this server container
+      # - FORCE_WIKI_MODE='public'    # activate this line to force wiki public mode
+      # - FORCE_WIKI_MODE='private'   # activate this line to force wiki private mode
+      - MAX_FILE_SIZE=500000 # 500KB
+
+    command: "dockerize
+              -wait tcp://mongo:27017
+              -wait tcp://elasticsearch:9200
+              -timeout 60s
+              npm run server:prod"
+    restart: unless-stopped
+    volumes:
+      - growi_data:/data
+
+  # a fully automated HTTPS server powered by Nginx, Let's Encrypt
+  # see https://github.com/SteveLTN/https-portal
+  https-portal:
+    image: steveltn/https-portal:1
+    ports:
+      - '80:80'
+      - '443:443'
+    links:
+      - app:app
+    environment:
+      DOMAINS: 'wiki.s-densan.tk -> http://app:3000' # <- rockerを使う場合は3838が必要！
+      STAGE: 'production'
+      FORCE_RENEW: 'false'
+      WEBSOCKET: 'true'
+      CLIENT_MAX_BODY_SIZE: 0
+    restart: unless-stopped
+    volumes:
+      - https-portal_data:/var/lib/https-portal
+
+  mongo:
+    image: mongo:3.6
+    ports:
+      - "${MONGO_PORT}:27017"
+    restart: unless-stopped
+    volumes:
+      - mongo_configdb:/data/configdb
+      - mongo_db:/data/db
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+
+
+
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+      dockerfile: ./Dockerfile
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms128m -Xmx128m"  # increase amount if you have enough memory
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: unless-stopped
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+
+volumes:
+  growi_data:
+  mongo_configdb:
+  mongo_db:
+  es_data:
+  https-portal_data:
