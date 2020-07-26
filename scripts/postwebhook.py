@@ -11,10 +11,21 @@ class WebhookContentsType(Enum):
     Json = auto()
     UrlEncoded = auto()
 
+def get_input():
+    acc = []
+    while True:
+        try:
+            acc.append(input('> ')) # Or whatever Prompt you prefer to use.
+        except EOFError:
+            out = '\n'.join(acc)
+            return out
+            break
+
 def main(args :List[str]) -> int:
-    if len(args) <= 1:
-        return 1
-    message = args[1]
+    message = str(get_input())
+    print(message)
+    if message.strip() == "":
+        return -1
     urls = {
        'notify_slack_system' : 'https://hooks.slack.com/services/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',
     }
