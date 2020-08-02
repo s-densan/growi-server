@@ -27,12 +27,29 @@ def main(args :List[str]) -> int:
     if message.strip() == "":
         return -1
     urls = {
-       'notify_slack_system' : 'https://hooks.slack.com/services/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',
+       #'notify_slack_system' : 'https://hooks.slack.com/services/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',
+       # 'notify_slack_system' : 'https://hooks.slack.com/services/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',
+       'notify_slack_system' : 'https://hooks.slack.com/services/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',
     }
     data = create_slack_data(message)
     post_webhook(urls['notify_slack_system'], data)
 def create_slack_data(text :str):
-    return {"text": text}
+    # slack_data = {
+    #     "channel": "TFUF3S108",
+    #     "blocks": [
+    #         {
+    #             "type": "section",
+    #             "text": {
+    #                 "type": "mrkdwn",
+    #                 "text": text
+    #             }
+    #         },
+    #     ]
+    # }
+    slack_data = {
+        "text": text
+    }
+    return slack_data
 
 def create_slack_attachment_data(attachments :List[Tuple[str, str, str]]):
     res = []
